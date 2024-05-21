@@ -172,11 +172,11 @@ const View = () => {
   const stateKeys = Object.keys(initialState);
   const [state, setState] = useState<State>(initialState);
 
-  const textToShowForResult = (result: number) => {
+  const textToShowForResult = (result: number, date: Date) => {
     if (result <= 0) {
-      return `Farm is not profitable after this date.`;
+      return `${date.toLocaleDateString()} $0.00`;
     }
-    return `Estimated Farm Value: $${Number(result.toFixed(2)).toLocaleString()}`;
+    return `${date.toLocaleDateString()}: $${Number(result.toFixed(2)).toLocaleString()}`;
   };
 
   const estimateMutation = useMutation({
@@ -246,17 +246,20 @@ const View = () => {
         <div className="mx-auto">
           {estimateMutation.isPending && <Loader />}
         </div>
+        {estimateMutation.data?.estimates && <p>Estimated Payment</p>}
         <div>
           {estimateMutation.data?.estimates.map(
-            (estimate) => {
+            (estimate, index) => {
               return (
                 <div
-                  className="border p-2  text-sm rounded-md my-2"
+                  className={`border p-2  text-sm rounded-md ${index !== 0 ? "mt-1" : ""}`}
                   key={estimate.timestamp}
                 >
                   <p>
-                    {new Date(estimate.timestamp * 1000).toLocaleDateString()}:
-                    {textToShowForResult(estimate.estimate)}
+                    {textToShowForResult(
+                      estimate.estimate,
+                      new Date(estimate.timestamp * 1000)
+                    )}
                   </p>
                 </div>
               );
