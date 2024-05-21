@@ -116,7 +116,7 @@ const View = () => {
   const initialState: State = {
     electricityPrice: {
       title: "Electricity Price ($Per kWh)",
-      description: "This is the price of electricity per KWH",
+      description: "This is the price of electricity per kWh",
       placeholder: ".25",
       value: 0.1198,
     },
@@ -128,13 +128,13 @@ const View = () => {
     },
     systemSize: {
       title: "System Size (kW)",
-      description: "This is the size of the solar system in KW",
+      description: "This is the size of the solar system in kW",
       placeholder: "5",
       value: 44.24,
     },
     systemOutput: {
       title: "System Output (kWh)",
-      description: "This is the output of the solar system in KWH per year",
+      description: "This is the output of the solar system in kWh per year",
       placeholder: "500",
       value: 80058,
     },
