@@ -28,6 +28,7 @@ type EstimateCalculationArgs = {
   protocolFeeValueMultiplier: number;
   effectiveSunHoursPerDay: number;
   systemSizeKW: number;
+  timestampToBenchmark: number;
 };
 function runEstimateCalculation(args: EstimateCalculationArgs) {
   console.log(args);
@@ -35,7 +36,7 @@ function runEstimateCalculation(args: EstimateCalculationArgs) {
   const c10 = args.carbonCreditEffectiveness;
   const c9 = args.electricityPrice;
   // const currentTimestamp = Math.floor(Date.now() / 1000);
-  let currentTimestamp = new Date().getTime() / 1000;
+  let currentTimestamp = args.timestampToBenchmark;
   const modOverflowTwoWeeks = Math.floor(
     (currentTimestamp - formulaConstants.startingDateTimestamp) /
       (86400 * 7 * 2)
@@ -86,17 +87,45 @@ async function getEstimateFarmValue(
   const sunlightHours = powerOutputKWH / 365.25 / systemSizeKW;
 
   const carbonCreditEffectiveness = res.data?.average_carbon_certificates;
-  const estimate = runEstimateCalculation({
-    maximumElectricityPrice: formulaConstants.maximumElectricityPrice,
-    electricityPrice: electricityPriceKWH,
-    carbonCreditEffectiveness,
-    protocolFeeValueMultiplier: formulaConstants.protocolFeeValueMultiplier,
-    effectiveSunHoursPerDay: sunlightHours,
-    systemSizeKW,
-  });
+  const firstTimestamp = new Date().getTime() / 1000;
+  const estimateCurrentWeek = {
+    timestamp: formulaConstants.startingDateTimestamp,
+    estimate: runEstimateCalculation({
+      maximumElectricityPrice: formulaConstants.maximumElectricityPrice,
+      electricityPrice: electricityPriceKWH,
+      carbonCreditEffectiveness,
+      protocolFeeValueMultiplier: formulaConstants.protocolFeeValueMultiplier,
+      effectiveSunHoursPerDay: sunlightHours,
+      systemSizeKW,
+      timestampToBenchmark: firstTimestamp,
+    }),
+  };
+
+  let otherEstimates: { timestamp: number; estimate: number }[] = [
+    estimateCurrentWeek,
+  ];
+  let counter = 1;
+  while (true) {
+    const nextWeekEstimate = runEstimateCalculation({
+      maximumElectricityPrice: formulaConstants.maximumElectricityPrice,
+      electricityPrice: electricityPriceKWH,
+      carbonCreditEffectiveness,
+      protocolFeeValueMultiplier: formulaConstants.protocolFeeValueMultiplier,
+      effectiveSunHoursPerDay: sunlightHours,
+      systemSizeKW,
+      timestampToBenchmark: firstTimestamp + 86400 * 7 * 2 * counter,
+    });
+
+    otherEstimates.push({
+      timestamp: firstTimestamp + 86400 * 7 * 2 * counter,
+      estimate: Math.max(0, nextWeekEstimate),
+    });
+    if (nextWeekEstimate <= 0) break;
+    counter++;
+  }
 
   return {
-    estimate,
+    estimates: otherEstimates,
   };
 }
 type SingleState = {
@@ -145,7 +174,7 @@ const View = () => {
 
   const textToShowForResult = (result: number) => {
     if (result <= 0) {
-      return `Farm is not profitable.`;
+      return `Farm is not profitable after this date.`;
     }
     return `Estimated Farm Value: $${Number(result.toFixed(2)).toLocaleString()}`;
   };
@@ -218,10 +247,23 @@ const View = () => {
           {estimateMutation.isPending && <Loader />}
         </div>
         <div>
-          {estimateMutation.data?.estimate && (
-            <div>
-              <p>{textToShowForResult(estimateMutation.data.estimate)}</p>
-            </div>
+          {estimateMutation.data?.estimates.map(
+            (estimate) => {
+              return (
+                <div
+                  className="border p-2  text-sm rounded-md my-2"
+                  key={estimate.timestamp}
+                >
+                  <p>
+                    {new Date(estimate.timestamp * 1000).toLocaleDateString()}:
+                    {textToShowForResult(estimate.estimate)}
+                  </p>
+                </div>
+              );
+            }
+            // <div>
+            //   <p>{textToShowForResult(estimateMutation.data.estimate)}</p>
+            // </div>
           )}
         </div>
       </div>
