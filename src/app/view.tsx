@@ -195,7 +195,7 @@ const View = () => {
               </p>
               <Input
                 type={"text"}
-                className="sm:w-full "
+                className="w-full "
                 // placeholder={input.placeholder}
                 size={40}
                 value={input.value || ""}
