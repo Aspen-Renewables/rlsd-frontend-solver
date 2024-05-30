@@ -25,12 +25,12 @@ export async function GET(request: Request) {
 }
 
 const formulaConstants = {
-  maximumElectricityPrice: 0.35,
+  maximumElectricityPrice: 0.32,
   protocolFeeValueMultiplier: 1.5,
   startingDateTimestamp: 1716149330,
-  targetTimestamp: 1716149330 + 86400 * 7 * 4, //it's starting date + 2 weeks
-  decayPerDay: 0.006, //.6%,
-  installerFee: 0.0,
+  targetTimestamp: 1716149330 + 86400 * 7 * 4, //it's starting date + 4 weeks
+  decayPerDay: 0.0055, //.55%,
+  installerFee: 0.2,
 };
 
 type EstimateCalculationArgs = {
