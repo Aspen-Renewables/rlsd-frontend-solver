@@ -1,6 +1,6 @@
 import { elysiaClient } from "@/api/elysiaClient";
 import { getLatLongFromZip } from "@/api/extra/getLatLongFromZip";
-
+import { createQuoteGroup, InsertQuoteSingle } from "@/db/schema";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
@@ -136,6 +136,29 @@ async function getEstimateFarmValue(
     if (nextWeekEstimate <= 0) break;
     counter++;
   }
+
+  const quoteGroup: InsertQuoteSingle[] = otherEstimates.map((estimate) => ({
+    electricityPrice: electricityPriceKWH.toString(),
+    powerOutput: powerOutputKWH.toString(),
+    systemSize: systemSizeKW.toString(),
+    zipCode: zipCode.toString(),
+    maximumElectricityPrice:
+      formulaConstants.maximumElectricityPrice.toString(),
+    protocolFeeValueMultiplier:
+      formulaConstants.protocolFeeValueMultiplier.toString(),
+    startingDateTimestamp: formulaConstants.startingDateTimestamp.toString(),
+    targetTimestamp: formulaConstants.targetTimestamp.toString(),
+    decayPerDay: formulaConstants.decayPerDay.toString(),
+    installerFee: formulaConstants.installerFee.toString(),
+    lat: lat.toString(),
+    lon: long.toString(),
+    carbonCreditEffectiveness: carbonCreditEffectiveness.toString(),
+    quote: estimate.estimate.toString(),
+    timestampToBenchmark: estimate.timestamp.toString(),
+  }));
+
+  //Insert it
+  await createQuoteGroup({ quotes: quoteGroup });
 
   return {
     estimates: otherEstimates,
