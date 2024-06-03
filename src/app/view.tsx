@@ -147,6 +147,13 @@ const View = () => {
           {estimateMutation.isPending && <Loader />}
         </div>
         {estimateMutation.data?.estimates && <p>Estimated Payment</p>}
+
+        {/**If the length is 0, have a message to contact admin */}
+        {estimateMutation.data?.estimates.length === 0 && (
+          <p className={`border p-2 text-sm rounded-md mt-1`}>
+            Please contact the admin to reset the estimates
+          </p>
+        )}
         <div>
           {estimateMutation.data?.estimates.map(
             (estimate, index) => {

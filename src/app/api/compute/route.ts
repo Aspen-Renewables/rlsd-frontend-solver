@@ -166,7 +166,13 @@ async function getEstimateFarmValue(
   //Insert it
   await createQuoteGroup({ quotes: quoteGroup, group });
 
+  //Filter other estimates to only include benchmarks >= current day
+  const currentDay = Math.floor(new Date().getTime() / 1000 / 1);
+  const filteredOtherEstimates = otherEstimates.filter(
+    (estimate) => estimate.timestamp / 86400 >= currentDay
+  );
+
   return {
-    estimates: otherEstimates,
+    estimates: filteredOtherEstimates,
   };
 }
