@@ -19,7 +19,7 @@ export const db = drizzle(sql);
 export const QuoteGroup = pgTable("quote_group", {
   id: serial("id").primaryKey(),
   createdAt: decimal("created_at", { precision: 15, scale: 0 })
-    .$defaultFn(() => (new Date().getTime() / 1000).toString())
+    .$defaultFn(() => Math.floor(new Date().getTime() / 1000).toString())
     .notNull(),
 });
 export const QuoteSingle = pgTable("quote", {
