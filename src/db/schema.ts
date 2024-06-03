@@ -96,5 +96,5 @@ export async function createQuoteGroup(data: CreateGroupArgs) {
 }
 
 const generateRandomNumber = (min: number, max: number) => {
-  return Math.random() * (max - min) + min;
+  return Math.floor(Math.random() * (max - min) + min);
 };
