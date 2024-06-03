@@ -81,10 +81,10 @@ async function getEstimateFarmValue(
   const { lat, lon: long } = await getLatLongFromZip(zipCode);
   // const res = await elysiaClient.protocolFees.estimateFees.get({
   //   $query: {
-  //     electricityPricePerKWH: (electricityPriceKWH * 1000).toString(),
-  //     latitude: lat.toString(),
-  //     longitude: long.toString(),
-  //     powerOutputMWH: (powerOutputKWH * 1000).toString(),
+  //     electricityPricePerKWH: (electricityPriceKWH * 1000).toFixed(4),
+  //     latitude: lat.toFixed(4),
+  //     longitude: long.toFixed(4),
+  //     powerOutputMWH: (powerOutputKWH * 1000).toFixed(4),
   //   },
   // });
   const res = await elysiaClient.protocolFees.sunlightAndCertificates.get({
@@ -138,23 +138,23 @@ async function getEstimateFarmValue(
   }
 
   const quoteGroup: InsertQuoteSingle[] = otherEstimates.map((estimate) => ({
-    electricityPrice: electricityPriceKWH.toString(),
-    powerOutput: powerOutputKWH.toString(),
-    systemSize: systemSizeKW.toString(),
-    zipCode: zipCode.toString(),
+    electricityPrice: electricityPriceKWH.toFixed(4),
+    powerOutput: powerOutputKWH.toFixed(4),
+    systemSize: systemSizeKW.toFixed(4),
+    zipCode: zipCode.toFixed(4),
     maximumElectricityPrice:
-      formulaConstants.maximumElectricityPrice.toString(),
+      formulaConstants.maximumElectricityPrice.toFixed(4),
     protocolFeeValueMultiplier:
-      formulaConstants.protocolFeeValueMultiplier.toString(),
-    startingDateTimestamp: formulaConstants.startingDateTimestamp.toString(),
-    targetTimestamp: formulaConstants.targetTimestamp.toString(),
-    decayPerDay: formulaConstants.decayPerDay.toString(),
-    installerFee: formulaConstants.installerFee.toString(),
-    lat: lat.toString(),
-    lon: long.toString(),
-    carbonCreditEffectiveness: carbonCreditEffectiveness.toString(),
-    quote: estimate.estimate.toString(),
-    timestampToBenchmark: estimate.timestamp.toString(),
+      formulaConstants.protocolFeeValueMultiplier.toFixed(4),
+    startingDateTimestamp: formulaConstants.startingDateTimestamp.toFixed(4),
+    targetTimestamp: formulaConstants.targetTimestamp.toFixed(4),
+    decayPerDay: formulaConstants.decayPerDay.toFixed(4),
+    installerFee: formulaConstants.installerFee.toFixed(4),
+    lat: lat.toFixed(4),
+    lon: long.toFixed(4),
+    carbonCreditEffectiveness: carbonCreditEffectiveness.toFixed(4),
+    quote: estimate.estimate.toFixed(4),
+    timestampToBenchmark: estimate.timestamp.toFixed(4),
   }));
 
   //Insert it

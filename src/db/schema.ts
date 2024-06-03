@@ -11,7 +11,6 @@ import {
 import { relations } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { nanoid } from "nanoid";
 // Use this object to send drizzle queries to your DB
 export const db = drizzle(sql);
 // Create a pgTable that maps to a table in your DB
