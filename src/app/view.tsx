@@ -115,6 +115,8 @@ const View = () => {
     <>
       <div className="flex flex-col  justify-center gap-y-4">
         {stateKeys.map((key) => {
+          //Don't loop over systemSize
+          if (key === "systemSize") return null;
           const input = state[key as keyof State];
           return (
             <div key={key}>
