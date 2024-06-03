@@ -20,9 +20,6 @@ export const QuoteGroup = pgTable("quote_group", {
   createdAt: decimal("created_at", { precision: 15, scale: 0 })
     .$defaultFn(() => Math.floor(new Date().getTime() / 1000).toString())
     .notNull(),
-});
-export const QuoteSingle = pgTable("quote", {
-  id: serial("id").primaryKey(),
   electricityPrice: decimal("electricity_price", {
     precision: 10,
     scale: 4,
@@ -54,6 +51,9 @@ export const QuoteSingle = pgTable("quote", {
     precision: 10,
     scale: 4,
   }).notNull(),
+});
+export const QuoteSingle = pgTable("quote", {
+  id: serial("id").primaryKey(),
   quote: decimal("quote", { precision: 10, scale: 4 }),
   timestampToBenchmark: decimal("timestamp_to_benchmark", {
     precision: 15,
@@ -82,16 +82,19 @@ export type InsertQuoteSingle = z.infer<typeof InsertQuoteSingleSchema>;
 // export const createQuoteGroup;
 
 type CreateGroupArgs = {
+  group: InsertQuoteGroup;
   quotes: InsertQuoteSingle[];
 };
 export async function createQuoteGroup(data: CreateGroupArgs) {
   const groupId = generateRandomNumber(0, 1_000_000_000);
+  data.group.id = groupId;
   data.quotes.forEach((quote) => {
     quote.quoteGroupId = groupId;
   });
+
   await db.transaction(async (tx) => {
-    const group = await tx.insert(QuoteGroup).values({ id: groupId });
-    const quotes = await tx.insert(QuoteSingle).values(data.quotes);
+    await tx.insert(QuoteGroup).values(data.group);
+    await tx.insert(QuoteSingle).values(data.quotes);
   });
 }
 
