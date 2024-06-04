@@ -35,9 +35,10 @@ const View = () => {
       errors: {},
     };
   };
-  const { register, handleSubmit, formState, getValues } = useForm<FormState>({
-    resolver,
-  });
+  const { register, handleSubmit, formState, getValues, setValue } =
+    useForm<FormState>({
+      resolver,
+    });
 
   // const latLongMutation = useMutation({
   //   mutationFn: getLatLongFromZip,
@@ -103,6 +104,8 @@ const View = () => {
       getValues("systemOutput") || initialState.systemOutput.value;
     const zipCodeForm =
       getValues("zipCode") || (initialState.zipCode.value as string);
+
+    console.log({ electricityPriceForm, systemOutputForm, zipCodeForm });
     const systemSize = initialState.systemSize.value;
     return await getEstimateFarmValue(
       electricityPriceForm as number,
@@ -131,13 +134,10 @@ const View = () => {
             <small>{initialState.electricityPrice.description}</small>
           </p>
           <Input
-            placeholder={initialState.electricityPrice.placeholder}
             defaultValue={initialState.electricityPrice.value as number}
             type="number"
             className="w-full"
-            onChange={(e) => {
-              register("electricityPrice");
-            }}
+            {...register("electricityPrice", { valueAsNumber: true })}
           />
         </div>
         <div>
@@ -147,28 +147,22 @@ const View = () => {
           </p>
           <Input
             type="text"
-            placeholder={initialState.zipCode.placeholder}
             defaultValue={initialState.zipCode.value as string}
             className="w-full"
-            onChange={(e) => {
-              register("zipCode");
-            }}
+            {...register("zipCode")}
           />
         </div>
 
         <div>
-          <Label className="text-sm">System Size (kW)</Label>
+          <Label className="text-sm">System Output (kW)</Label>
           <p>
-            <small>{initialState.systemSize.description}</small>
+            <small>{initialState.systemOutput.description}</small>
           </p>
           <Input
-            placeholder={initialState.systemSize.placeholder}
-            defaultValue={initialState.systemSize.value as number}
+            defaultValue={initialState.systemOutput.value as number}
             type="number"
             className="w-full"
-            onChange={(e) => {
-              register("systemOutput");
-            }}
+            {...register("systemOutput", { valueAsNumber: true })}
           />
         </div>
         <Button
