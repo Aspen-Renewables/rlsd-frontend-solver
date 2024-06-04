@@ -19,6 +19,7 @@ type SingleState = {
   description: string;
   placeholder: string;
   value: string | number | null;
+  inputType: "number" | "text";
 };
 type StateKey = "electricityPrice" | "zipCode" | "systemSize" | "systemOutput";
 type State = Record<StateKey, SingleState>;
@@ -48,24 +49,28 @@ const View = () => {
       description: "This is the price of electricity per kWh",
       placeholder: ".25",
       value: 0.1198,
+      inputType: "number",
     },
     zipCode: {
       title: "Zip Code",
       description: "This is the zip code of the location",
       placeholder: "90210",
-      value: 75173,
+      value: "75173",
+      inputType: "text",
     },
     systemSize: {
       title: "System Size (kW)",
       description: "This is the size of the solar system in kW",
       placeholder: "5",
       value: 44.24,
+      inputType: "number",
     },
     systemOutput: {
       title: "System Output (kWh)",
       description: "This is the output of the solar system in kWh per year",
       placeholder: "500",
       value: 80058,
+      inputType: "number",
     },
   };
 
@@ -100,8 +105,24 @@ const View = () => {
     // }));
     //if the value is a number, convert it to a number
     //if not a number, set to null
+    // console.log(value);
+    const inputType = state[key].inputType;
+    //If it's string, just set to string
+    if (inputType === "text") {
+      setState((prev) => ({
+        ...prev,
+        [key]: {
+          ...prev[key],
+          value,
+        },
+      }));
+      return;
+    }
+
     if (value === "") value = null as unknown as string;
     const newValue = isNaN(Number(value)) ? value : Number(value);
+    //Get input type of the key
+
     setState((prev) => ({
       ...prev,
       [key]: {
@@ -111,6 +132,12 @@ const View = () => {
     }));
   }
 
+  function renderInputValue(val: string | number | null) {
+    //if number, return number
+    if (typeof val === "number") return val;
+    if (val === null) return "";
+    return val;
+  }
   return (
     <>
       <div className="flex flex-col  justify-center gap-y-4">
@@ -125,11 +152,11 @@ const View = () => {
                 <small>{input.description}</small>
               </p>
               <Input
-                type={"text"}
+                type={input.inputType}
                 className="w-full "
                 // placeholder={input.placeholder}
                 size={40}
-                value={input.value || ""}
+                value={renderInputValue(input.value)}
                 onChange={(e) =>
                   handleChangeKey(key as keyof State, e.target.value)
                 }
