@@ -164,7 +164,7 @@ async function getEstimateFarmValue(
   }));
 
   //Insert it
-  // await createQuoteGroup({ quotes: quoteGroup, group });
+  await createQuoteGroup({ quotes: quoteGroup, group });
 
   //Filter other estimates to only include benchmarks >= current day
   const currentDay = Math.floor(new Date().getTime() / 1000 / 86400);
