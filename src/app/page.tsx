@@ -1,5 +1,5 @@
 import Image from "next/image";
-import View from "./hookview";
+import View from "./view";
 
 export default function Home() {
   return (
