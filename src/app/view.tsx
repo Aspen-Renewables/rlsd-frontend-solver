@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { useForm, Resolver } from "react-hook-form";
+import { checkIfNumber } from "@/lib/check-if-number";
 
 const Loader = () => {
   return (
@@ -135,6 +136,7 @@ const View = () => {
           </p>
           <Input
             defaultValue={initialState.electricityPrice.value as number}
+            onKeyDown={checkIfNumber}
             type="number"
             className="w-full"
             {...register("electricityPrice", { valueAsNumber: true })}
@@ -160,6 +162,7 @@ const View = () => {
           </p>
           <Input
             defaultValue={initialState.systemOutput.value as number}
+            onKeyDown={checkIfNumber}
             type="number"
             className="w-full"
             {...register("systemOutput", { valueAsNumber: true })}
