@@ -1,17 +1,22 @@
 "use client";
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { elysiaClient } from "@/api/elysiaClient";
-import { getLatLongFromZip } from "@/api/extra/getLatLongFromZip";
-import { useQueries } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
+import { useForm, Resolver } from "react-hook-form";
 
 const Loader = () => {
   return (
     <div className="w-8 h-8 border-2 border-t-0 border-black rounded-full animate-spin"></div>
   );
+};
+
+type FormState = {
+  electricityPrice: number;
+  zipCode: string;
+  systemOutput: number;
 };
 
 type SingleState = {
@@ -24,6 +29,16 @@ type SingleState = {
 type StateKey = "electricityPrice" | "zipCode" | "systemSize" | "systemOutput";
 type State = Record<StateKey, SingleState>;
 const View = () => {
+  const resolver: Resolver<FormState> = async (values) => {
+    return {
+      values: values,
+      errors: {},
+    };
+  };
+  const { register, handleSubmit, formState, getValues } = useForm<FormState>({
+    resolver,
+  });
+
   // const latLongMutation = useMutation({
   //   mutationFn: getLatLongFromZip,
   //   mutationKey: ["latLong"],
@@ -33,7 +48,7 @@ const View = () => {
     electricityPrice: number,
     systemOutput: number,
     systemSize: number,
-    zipCode: number
+    zipCode: string
   ) {
     const res = await fetch(
       `/api/compute?electricityPrice=${electricityPrice}&powerOutput=${systemOutput}&systemSize=${systemSize}&zipCode=${zipCode}`
@@ -74,9 +89,6 @@ const View = () => {
     },
   };
 
-  const stateKeys = Object.keys(initialState);
-  const [state, setState] = useState<State>(initialState);
-
   const textToShowForResult = (result: number, date: Date) => {
     if (result <= 0) {
       return `${date.toLocaleDateString()} $0.00`;
@@ -84,53 +96,25 @@ const View = () => {
     return `${date.toLocaleDateString()}: $${Number(result.toFixed(2)).toLocaleString()}`;
   };
 
+  const estimateMutationFN = async () => {
+    const electricityPriceForm =
+      getValues("electricityPrice") || initialState.electricityPrice.value;
+    const systemOutputForm =
+      getValues("systemOutput") || initialState.systemOutput.value;
+    const zipCodeForm =
+      getValues("zipCode") || (initialState.zipCode.value as string);
+    const systemSize = initialState.systemSize.value;
+    return await getEstimateFarmValue(
+      electricityPriceForm as number,
+      systemOutputForm as number,
+      systemSize as number,
+      zipCodeForm
+    );
+  };
   const estimateMutation = useMutation({
-    mutationFn: () =>
-      getEstimateFarmValue(
-        state.electricityPrice.value as number,
-        state.systemOutput.value as number,
-        state.systemSize.value as number,
-        state.zipCode.value as number
-      ),
-    mutationKey: ["estimate", JSON.stringify(state)],
+    mutationFn: () => estimateMutationFN(),
+    mutationKey: ["estimate"],
   });
-
-  function handleChangeKey(key: keyof State, value: string) {
-    // setState((prev) => ({
-    //   ...prev,
-    //   [key]: {
-    //     ...prev[key],
-    //     value,
-    //   },
-    // }));
-    //if the value is a number, convert it to a number
-    //if not a number, set to null
-    // console.log(value);
-    const inputType = state[key].inputType;
-    //If it's string, just set to string
-    if (inputType === "text") {
-      setState((prev) => ({
-        ...prev,
-        [key]: {
-          ...prev[key],
-          value,
-        },
-      }));
-      return;
-    }
-
-    if (value === "") value = null as unknown as string;
-    const newValue = isNaN(Number(value)) ? value : Number(value);
-    //Get input type of the key
-
-    setState((prev) => ({
-      ...prev,
-      [key]: {
-        ...prev[key],
-        value: newValue,
-      },
-    }));
-  }
 
   function renderInputValue(val: string | number | null) {
     //if number, return number
@@ -141,29 +125,52 @@ const View = () => {
   return (
     <>
       <div className="flex flex-col  justify-center gap-y-4">
-        {stateKeys.map((key) => {
-          //Don't loop over systemSize
-          if (key === "systemSize") return null;
-          const input = state[key as keyof State];
-          return (
-            <div key={key}>
-              <Label>{input.title}</Label>
-              <p>
-                <small>{input.description}</small>
-              </p>
-              <Input
-                type={input.inputType}
-                className="w-full "
-                // placeholder={input.placeholder}
-                size={40}
-                value={renderInputValue(input.value)}
-                onChange={(e) =>
-                  handleChangeKey(key as keyof State, e.target.value)
-                }
-              />
-            </div>
-          );
-        })}
+        <div>
+          <Label className="text-sm">Electricity Price ($Per kWh)</Label>
+          <p>
+            <small>{initialState.electricityPrice.description}</small>
+          </p>
+          <Input
+            placeholder={initialState.electricityPrice.placeholder}
+            defaultValue={initialState.electricityPrice.value as number}
+            type="number"
+            className="w-full"
+            onChange={(e) => {
+              register("electricityPrice");
+            }}
+          />
+        </div>
+        <div>
+          <Label className="text-sm">Zip Code</Label>
+          <p>
+            <small>{initialState.zipCode.description}</small>
+          </p>
+          <Input
+            type="text"
+            placeholder={initialState.zipCode.placeholder}
+            defaultValue={initialState.zipCode.value as string}
+            className="w-full"
+            onChange={(e) => {
+              register("zipCode");
+            }}
+          />
+        </div>
+
+        <div>
+          <Label className="text-sm">System Size (kW)</Label>
+          <p>
+            <small>{initialState.systemSize.description}</small>
+          </p>
+          <Input
+            placeholder={initialState.systemSize.placeholder}
+            defaultValue={initialState.systemSize.value as number}
+            type="number"
+            className="w-full"
+            onChange={(e) => {
+              register("systemOutput");
+            }}
+          />
+        </div>
         <Button
           onClick={() => {
             estimateMutation.mutate();
@@ -184,26 +191,21 @@ const View = () => {
           </p>
         )}
         <div>
-          {estimateMutation.data?.estimates.map(
-            (estimate, index) => {
-              return (
-                <div
-                  className={`border p-2  text-sm rounded-md ${index !== 0 ? "mt-1" : ""}`}
-                  key={estimate.timestamp}
-                >
-                  <p>
-                    {textToShowForResult(
-                      estimate.estimate,
-                      new Date(estimate.timestamp * 1000)
-                    )}
-                  </p>
-                </div>
-              );
-            }
-            // <div>
-            //   <p>{textToShowForResult(estimateMutation.data.estimate)}</p>
-            // </div>
-          )}
+          {estimateMutation.data?.estimates.map((estimate, index) => {
+            return (
+              <div
+                className={`border p-2  text-sm rounded-md ${index !== 0 ? "mt-1" : ""}`}
+                key={estimate.timestamp}
+              >
+                <p>
+                  {textToShowForResult(
+                    estimate.estimate,
+                    new Date(estimate.timestamp * 1000)
+                  )}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </>
@@ -211,3 +213,27 @@ const View = () => {
 };
 
 export default View;
+
+/* {stateKeys.map((key) => {
+          //Don't loop over systemSize
+          if (key === "systemSize") return null;
+          const input = state[key as keyof State];
+          return (
+            <div key={key}>
+              <Label>{input.title}</Label>
+              <p>
+                <small>{input.description}</small>
+              </p>
+              <Input
+                type={input.inputType}
+                className="w-full "
+                // placeholder={input.placeholder}
+                size={40}
+                value={renderInputValue(input.value)}
+                onChange={(e) =>
+                //   handleChangeKey(key as keyof State, e.target.value)
+                }
+              />
+            </div>
+          );
+        })}*/
