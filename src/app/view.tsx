@@ -65,7 +65,7 @@ const View = () => {
       title: "Electricity Price ($Per kWh)",
       description: "This is the price of electricity per kWh",
       placeholder: ".25",
-      value: 0.1198,
+      value: 0.13,
       inputType: "number",
     },
     zipCode: {

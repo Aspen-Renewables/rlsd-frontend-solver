@@ -28,11 +28,12 @@ export async function GET(request: Request) {
   return Response.json({ ...data });
 }
 
+const targetTimestamp = 1718028000;
 const formulaConstants = {
-  maximumElectricityPrice: 0.32,
+  maximumElectricityPrice: 0.35,
   protocolFeeValueMultiplier: 1.5,
-  startingDateTimestamp: 1716149330,
-  targetTimestamp: 1716149330 + 86400 * 7 * 4, //it's starting date + 4 weeks
+  startingDateTimestamp: targetTimestamp,
+  targetTimestamp: targetTimestamp + 86400 * 7 * 4, //it's starting date + 4 weeks
   decayPerDay: 0.0055, //.55%,
   installerFee: 0.2,
 };
