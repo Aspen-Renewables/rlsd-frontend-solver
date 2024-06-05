@@ -185,6 +185,7 @@ const View = (args: Args) => {
   useEffect(() => {
     if (estimateMutation.isError) {
       setDisplayState("error");
+      toast("Error calculating estimate. Check your inputs and try again.");
     }
   }, [estimateMutation.isError]);
 
