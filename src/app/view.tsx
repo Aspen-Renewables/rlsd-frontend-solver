@@ -224,7 +224,7 @@ const View = (args: Args) => {
               />
             )}
             {/* <p>logo</p> */}
-            <img className="max- h-[30px] md:h-[40px]" src={metadata.logo} />
+            <img className="max- h-[40px]" src={metadata.logo} />
           </div>
           {displayState === "loading" && (
             <div className="flex h-full absolute inset-0 w-full items-center justify-center">
