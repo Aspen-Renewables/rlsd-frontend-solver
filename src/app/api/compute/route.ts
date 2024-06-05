@@ -1,10 +1,7 @@
 import { elysiaClient } from "@/api/elysiaClient";
 import { getLatLongFromZip } from "@/api/extra/getLatLongFromZip";
-import {
-  createQuoteGroup,
-  InsertQuoteGroup,
-  InsertQuoteSingle,
-} from "@/db/schema";
+import { InsertQuoteGroup, InsertQuoteSingle } from "@/db/schema";
+import { createQuoteGroup } from "@/db/queries";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
@@ -22,7 +19,7 @@ export async function GET(request: Request) {
     parseFloat(electricityPrice),
     parseFloat(powerOutput),
     parseFloat(systemSize),
-    parseInt(zipCode)
+    zipCode
   );
 
   return Response.json({ ...data });
@@ -81,7 +78,7 @@ async function getEstimateFarmValue(
   electricityPriceKWH: number,
   powerOutputKWH: number,
   systemSizeKW: number,
-  zipCode: number
+  zipCode: string
 ) {
   const { lat, lon: long } = await getLatLongFromZip(zipCode);
   // const res = await elysiaClient.protocolFees.estimateFees.get({
@@ -146,7 +143,7 @@ async function getEstimateFarmValue(
     electricityPrice: electricityPriceKWH.toFixed(4),
     powerOutput: powerOutputKWH.toFixed(4),
     systemSize: systemSizeKW.toFixed(4),
-    zipCode: zipCode.toFixed(4),
+    zipCode: zipCode,
     maximumElectricityPrice:
       formulaConstants.maximumElectricityPrice.toFixed(4),
     protocolFeeValueMultiplier:
@@ -165,7 +162,12 @@ async function getEstimateFarmValue(
   }));
 
   //Insert it
-  await createQuoteGroup({ quotes: quoteGroup, group });
+  const { quoteGroupId } = await createQuoteGroup({
+    quotes: quoteGroup,
+    group,
+  });
+
+  // const quoteGroupId = 10;
 
   //Filter other estimates to only include benchmarks >= current day
   const currentDay = Math.floor(new Date().getTime() / 1000 / 86400);
@@ -175,5 +177,6 @@ async function getEstimateFarmValue(
 
   return {
     estimates: filteredOtherEstimates,
+    quoteGroupId,
   };
 }

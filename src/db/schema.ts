@@ -8,11 +8,10 @@ import {
   uniqueIndex,
   decimal,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { eq, relations } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 // Use this object to send drizzle queries to your DB
-export const db = drizzle(sql);
 // Create a pgTable that maps to a table in your DB
 
 export const QuoteGroup = pgTable("quote_group", {
@@ -79,25 +78,3 @@ const InsertQuoteGroupSchema = createInsertSchema(QuoteGroup);
 export type InsertQuoteGroup = z.infer<typeof InsertQuoteGroupSchema>;
 const InsertQuoteSingleSchema = createInsertSchema(QuoteSingle);
 export type InsertQuoteSingle = z.infer<typeof InsertQuoteSingleSchema>;
-// export const createQuoteGroup;
-
-type CreateGroupArgs = {
-  group: InsertQuoteGroup;
-  quotes: InsertQuoteSingle[];
-};
-export async function createQuoteGroup(data: CreateGroupArgs) {
-  const groupId = generateRandomNumber(0, 1_000_000_000);
-  data.group.id = groupId;
-  data.quotes.forEach((quote) => {
-    quote.quoteGroupId = groupId;
-  });
-
-  await db.transaction(async (tx) => {
-    await tx.insert(QuoteGroup).values(data.group);
-    await tx.insert(QuoteSingle).values(data.quotes);
-  });
-}
-
-const generateRandomNumber = (min: number, max: number) => {
-  return Math.floor(Math.random() * (max - min) + min);
-};
