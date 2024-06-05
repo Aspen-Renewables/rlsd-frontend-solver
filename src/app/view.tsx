@@ -212,7 +212,7 @@ const View = (args: Args) => {
   return (
     <>
       <div className="flex flex-col  justify-center gap-y-4">
-        <div className="border relative  w-[600px] bg-white  border-black rounded-lg max-w-[90%]">
+        <div className="border relative  w-[90vw] md:w-[600px] bg-white  border-black rounded-lg ">
           <div className="flex flex-row items-center justify-center relative">
             {displayState === "result" && (
               <FaChevronCircleLeft
@@ -224,7 +224,7 @@ const View = (args: Args) => {
               />
             )}
             {/* <p>logo</p> */}
-            <img className="max-h-[40px]" src={metadata.logo} />
+            <img className="max- h-[30px] md:h-[40px]" src={metadata.logo} />
           </div>
           {displayState === "loading" && (
             <div className="flex h-full absolute inset-0 w-full items-center justify-center">
