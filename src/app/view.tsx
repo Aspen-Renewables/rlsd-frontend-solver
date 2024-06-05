@@ -156,7 +156,7 @@ const View = () => {
         </div>
 
         <div>
-          <Label className="text-sm">System Output (kW)</Label>
+          <Label className="text-sm">System Output (kWh)</Label>
           <p>
             <small>{initialState.systemOutput.description}</small>
           </p>
