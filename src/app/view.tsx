@@ -212,7 +212,7 @@ const View = (args: Args) => {
   return (
     <>
       <div className="flex flex-col  justify-center gap-y-4">
-        <div className="border relative  w-[600px]  border-black rounded-lg max-w-[90%]">
+        <div className="border relative  w-[600px] bg-white  border-black rounded-lg max-w-[90%]">
           <div className="flex flex-row items-center justify-center relative">
             {displayState === "result" && (
               <FaChevronCircleLeft
