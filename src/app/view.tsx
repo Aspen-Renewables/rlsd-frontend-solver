@@ -61,6 +61,9 @@ type SingleState = {
 type StateKey = "electricityPrice" | "zipCode" | "systemSize" | "systemOutput";
 type Args = {
   estimates: Estimate[] | null;
+  zipCode: string | null;
+  electricityPrice: number | null;
+  systemOutput: number | null;
 };
 type State = Record<StateKey, SingleState>;
 const View = (args: Args) => {
@@ -72,6 +75,7 @@ const View = (args: Args) => {
     };
   };
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
+
   const [displayState, setDisplayState] = useState<DisplayState>(
     args.estimates ? "result" : "input"
   );
@@ -116,14 +120,14 @@ const View = (args: Args) => {
       title: "Electricity Price ($Per kWh)",
       description: "This is the price of electricity per kWh",
       placeholder: ".25",
-      value: 0.13,
+      value: args.electricityPrice || 0.13,
       inputType: "number",
     },
     zipCode: {
       title: "Zip Code",
       description: "This is the zip code of the location",
       placeholder: "90210",
-      value: "75173",
+      value: args.zipCode || "75173",
       inputType: "text",
     },
     systemSize: {
@@ -137,7 +141,7 @@ const View = (args: Args) => {
       title: "System Output (kWh)",
       description: "This is the output of the solar system in kWh per year",
       placeholder: "500",
-      value: 80058,
+      value: args.systemOutput || 80058,
       inputType: "number",
     },
   };
@@ -150,7 +154,6 @@ const View = (args: Args) => {
   };
 
   const estimateMutationFN = async () => {
-    if (args.estimates) return { estimates: args.estimates };
     const electricityPriceForm =
       getValues("electricityPrice") || initialState.electricityPrice.value;
     const systemOutputForm =

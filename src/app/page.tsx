@@ -10,6 +10,9 @@ export default async function Home({
   };
 }) {
   let estimates: Estimate[] | null = null;
+  let zipCode: string | null = null;
+  let electricityPrice: number | null = null;
+  let systemOutput: number | null = null;
   if (searchParams.groupId) {
     const groupId = parseInt(searchParams.groupId);
     const group = await getQuoteGroup(groupId);
@@ -19,10 +22,18 @@ export default async function Home({
       estimate: parseFloat(quote.quote!),
     }));
     estimates = _estimates;
+    zipCode = group.zipCode;
+    electricityPrice = parseFloat(group.electricityPrice);
+    systemOutput = parseFloat(group.powerOutput);
   }
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <View estimates={estimates} />
+      <View
+        zipCode={zipCode}
+        electricityPrice={electricityPrice}
+        systemOutput={systemOutput}
+        estimates={estimates}
+      />
     </main>
   );
 }
