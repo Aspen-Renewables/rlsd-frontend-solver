@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { metadata } from "@/constants/metadata";
 
 export type Estimate = {
   estimate: number;
@@ -223,10 +224,7 @@ const View = (args: Args) => {
               />
             )}
             {/* <p>logo</p> */}
-            <img
-              className="max-h-[40px]"
-              src="https://static.wixstatic.com/media/9697bc_c77e036cbd0e4636bc0a9d02283aa2b4~mv2.png/v1/fill/w_381,h_119,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/aspen-renewables-logo.png"
-            />
+            <img className="max-h-[40px]" src={metadata.logo} />
           </div>
           {displayState === "loading" && (
             <div className="flex h-full absolute inset-0 w-full items-center justify-center">
