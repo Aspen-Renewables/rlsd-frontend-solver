@@ -25,6 +25,14 @@ export async function GET(request: Request) {
   return Response.json({ ...data });
 }
 
+const DEFAULT_INSTALLER_FEES = 0.2;
+const getInstallerFee = (): number => {
+  const installerFee = process.env.INSTALLER_FEE;
+  if (!installerFee) return DEFAULT_INSTALLER_FEES;
+  const float = parseFloat(installerFee);
+  if (isNaN(float)) return DEFAULT_INSTALLER_FEES;
+  return float;
+};
 const targetTimestamp = 1718028000;
 const formulaConstants = {
   maximumElectricityPrice: 0.35,
@@ -32,7 +40,7 @@ const formulaConstants = {
   startingDateTimestamp: targetTimestamp,
   targetTimestamp: targetTimestamp + 86400 * 7 * 4, //it's starting date + 4 weeks
   decayPerDay: 0.0055, //.55%,
-  installerFee: 0.2,
+  installerFee: getInstallerFee(),
 };
 
 type EstimateCalculationArgs = {
