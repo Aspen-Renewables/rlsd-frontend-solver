@@ -1,8 +1,12 @@
 import { elysiaClient } from "@/api/elysiaClient";
 import { getLatLongFromZip } from "@/api/extra/getLatLongFromZip";
-import { InsertQuoteGroup, InsertQuoteSingle } from "@/db/schema";
+import { InsertQuoteGroup, InsertQuoteSingle, QuoteGroup } from "@/db/schema";
 import { createQuoteGroup } from "@/db/queries";
+import { db } from "@/db/db";
 export async function GET(request: Request) {
+  //Delete and return
+  // await db.delete(QuoteGroup);
+  // return Response.json({ message: "Deleted" });
   const { searchParams } = new URL(request.url);
 
   const electricityPrice = searchParams.get("electricityPrice");

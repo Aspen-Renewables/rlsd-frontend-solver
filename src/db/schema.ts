@@ -14,6 +14,41 @@ import { z } from "zod";
 // Use this object to send drizzle queries to your DB
 // Create a pgTable that maps to a table in your DB
 
+export const ApprovedQuoteGroup = pgTable(
+  "approved_quote_group",
+  {
+    id: serial("id").primaryKey(),
+    approvalTimestamp: decimal("approval_timestamp", {
+      precision: 15,
+      scale: 0,
+    })
+      .notNull()
+      .$defaultFn(() => Math.floor(new Date().getTime() / 1000).toString()),
+    quoteGroupId: serial("quote_group_id").references(() => QuoteGroup.id),
+  },
+  (t) => {
+    return {
+      uniqueQuoteGroupId: uniqueIndex("unique_quote_group_id").on(
+        t.quoteGroupId
+      ),
+    };
+  }
+);
+
+export const approvedQuoteGroupRelations = relations(
+  ApprovedQuoteGroup,
+  ({ one }) => ({
+    quoteGroup: one(QuoteGroup, {
+      fields: [ApprovedQuoteGroup.quoteGroupId],
+      references: [QuoteGroup.id],
+    }),
+  })
+);
+
+export const TotalBudgetGranted = pgTable("total_budget_granted", {
+  id: serial("id").primaryKey(),
+  amount: decimal("amount", { precision: 15, scale: 4 }).notNull(),
+});
 export const QuoteGroup = pgTable("quote_group", {
   id: serial("id").primaryKey(),
   createdAt: decimal("created_at", { precision: 15, scale: 0 })
@@ -51,6 +86,7 @@ export const QuoteGroup = pgTable("quote_group", {
     scale: 4,
   }).notNull(),
 });
+
 export const QuoteSingle = pgTable("quote", {
   id: serial("id").primaryKey(),
   quote: decimal("quote", { precision: 10, scale: 4 }),
@@ -59,7 +95,7 @@ export const QuoteSingle = pgTable("quote", {
     scale: 0,
   }).notNull(),
   quoteGroupId: serial("quote_group_id")
-    .references(() => QuoteGroup.id)
+    .references(() => QuoteGroup.id, { onDelete: "cascade" })
     .notNull(),
 });
 
