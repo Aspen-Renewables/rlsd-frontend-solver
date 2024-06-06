@@ -54,6 +54,7 @@ type EstimateCalculationArgs = {
   installerFee: number;
 };
 function runEstimateCalculation(args: EstimateCalculationArgs) {
+  console.log(`installer fee is ${args.installerFee}`);
   const c3 = args.maximumElectricityPrice;
   const c10 = args.carbonCreditEffectiveness;
   const c9 = args.electricityPrice;
