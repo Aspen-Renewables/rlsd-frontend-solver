@@ -1,0 +1,54 @@
+{
+  "farmValueEstimtesAndTimestamps": [
+    {
+      "farmValueEstimate": 11515.151515151514,
+      "timestampToBenchmark": 1717768800
+    },
+    {
+      "farmValueEstimate": 10074.047912425016,
+      "timestampToBenchmark": 1718978400
+    },
+    {
+      "farmValueEstimate": 8740.028257503382,
+      "timestampToBenchmark": 1720188000
+    },
+    {
+      "farmValueEstimate": 7505.135473701924,
+      "timestampToBenchmark": 1721397600
+    },
+    {
+      "farmValueEstimate": 6362.003750073385,
+      "timestampToBenchmark": 1722607200
+    },
+    {
+      "farmValueEstimate": 5303.814606281247,
+      "timestampToBenchmark": 1723816800
+    },
+    {
+      "farmValueEstimate": 4324.256222156303,
+      "timestampToBenchmark": 1725026400
+    },
+    {
+      "farmValueEstimate": 3417.4857893479684,
+      "timestampToBenchmark": 1726236000
+    },
+    {
+      "farmValueEstimate": 2578.094660507881,
+      "timestampToBenchmark": 1727445600
+    },
+    {
+      "farmValueEstimate": 1801.0760881297415,
+      "timestampToBenchmark": 1728655200
+    },
+    {
+      "farmValueEstimate": 1081.7953606161411,
+      "timestampToBenchmark": 1729864800
+    },
+    {
+      "farmValueEstimate": 415.9621574417956,
+      "timestampToBenchmark": 1731074400
+    },
+    { "farmValueEstimate": 0, "timestampToBenchmark": 1732284000 }
+  ],
+  "protocolFees": 23636.36363636364
+}

@@ -11,6 +11,7 @@ import {
 } from "./schema";
 import { db } from "./db";
 import { sql } from "drizzle-orm";
+import { DEFAULT_INSTALL_FEE } from "@/constants";
 
 type CreateGroupArgs = {
   group: InsertQuoteGroup;
@@ -77,7 +78,7 @@ export type ReturnTypeOfGetApprovedQuoteGroups = Awaited<
 >;
 
 export async function approveQuoteGroup(id: number) {
-  const INSTALLER_FEE = 1200;
+  const INSTALLER_FEE = DEFAULT_INSTALL_FEE;
   await db.transaction(async (tx) => {
     const quoteGroupId = await tx.query.QuoteGroup.findFirst({
       where: (quoteGroup, { eq }) => eq(quoteGroup.id, id),

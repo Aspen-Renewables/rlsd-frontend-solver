@@ -81,10 +81,14 @@ export const QuoteGroup = pgTable("quote_group", {
   }).notNull(),
   decayPerDay: decimal("decay_per_day", { precision: 10, scale: 5 }).notNull(),
   scoutingFee: decimal("installer_fee", { precision: 10, scale: 4 }).notNull(),
-  lat: decimal("lat", { precision: 10, scale: 4 }),
+  lat: decimal("lat", { precision: 10, scale: 4 }).notNull(),
   lon: decimal("lon", { precision: 10, scale: 4 }).notNull(),
   carbonCreditEffectiveness: decimal("carbon_credit_effectiveness", {
     precision: 10,
+    scale: 4,
+  }).notNull(),
+  installFixedFee: decimal("install_fixed_fee", {
+    precision: 12,
     scale: 4,
   }).notNull(),
   protocolFees: decimal("protocol_fees", { precision: 14, scale: 4 }).notNull(),
@@ -92,7 +96,7 @@ export const QuoteGroup = pgTable("quote_group", {
 
 export const QuoteSingle = pgTable("quote", {
   id: serial("id").primaryKey(),
-  quote: decimal("quote", { precision: 10, scale: 4 }),
+  quote: decimal("quote", { precision: 10, scale: 4 }).notNull(),
   timestampToBenchmark: decimal("timestamp_to_benchmark", {
     precision: 15,
     scale: 0,

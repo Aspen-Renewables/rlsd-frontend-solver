@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "npx drizzle-kit push && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "studio": "npx drizzle-kit studio",
+    "db:push": "npx drizzle-kit push"
   },
   "dependencies": {
     "@elysiajs/eden": "^1.0.13",

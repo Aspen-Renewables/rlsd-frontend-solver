@@ -112,7 +112,9 @@ const View = (args: Args) => {
     const data = (await res.json()) as {
       estimates: { estimate: number; timestamp: number }[];
       quoteGroupId: number;
+      totalBudget: number;
     };
+    console.log("Total Impact On Budget = ", data.totalBudget);
     //Router.push ?quoteGroupId
     router.push(`/?groupId=${data.quoteGroupId}`);
     return data;
@@ -143,7 +145,7 @@ const View = (args: Args) => {
       title: "System Output (kWh)",
       description: "This is the output of the solar system in kWh per year",
       placeholder: "500",
-      value: args.systemOutput || 80058,
+      value: args.systemOutput || 20_000,
       inputType: "number",
     },
   };

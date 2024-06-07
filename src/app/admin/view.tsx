@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { DEFAULT_INSTALL_FEE } from "@/constants";
 const View = () => {
   const [groupId, setGroupId] = React.useState<number | null>(null);
 
@@ -111,7 +112,12 @@ const View = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Date</TableHead>
-            <TableHead>Amount</TableHead>
+            <TableHead>Farm Value</TableHead>
+            <TableHead>Protocol Fee</TableHead>
+            <TableHead>Install Fee</TableHead>
+            <TableHead>Budget Consumed</TableHead>
+            <TableHead>Scouting Fee</TableHead>
+            <TableHead>Installer Value</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -124,8 +130,46 @@ const View = () => {
                       parseInt(quote.timestampToBenchmark) * 1000
                     ).toLocaleDateString()}
                   </TableCell>
+
                   <TableCell>
                     ${parseFloat(quote.quote!).toLocaleString()}
+                  </TableCell>
+                  <TableCell>
+                    $
+                    {parseFloat(
+                      findGroupQuery.data?.protocolFees
+                    ).toLocaleString()}
+                  </TableCell>
+
+                  <TableCell>
+                    $
+                    {parseFloat(findGroupQuery?.data.installFixedFee).toFixed(
+                      2
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    $
+                    {(
+                      parseFloat(quote.quote!) +
+                      parseFloat(findGroupQuery.data?.protocolFees) +
+                      parseFloat(findGroupQuery.data?.installFixedFee)
+                    ).toLocaleString()}
+                  </TableCell>
+
+                  <TableCell>
+                    $
+                    {(
+                      parseFloat(quote.quote!) *
+                      parseFloat(findGroupQuery.data?.scoutingFee)
+                    ).toLocaleString()}
+                  </TableCell>
+
+                  <TableCell>
+                    $
+                    {(
+                      parseFloat(quote.quote!) *
+                      (1 - parseFloat(findGroupQuery.data?.scoutingFee!))
+                    ).toLocaleString()}
                   </TableCell>
                 </TableRow>
               );

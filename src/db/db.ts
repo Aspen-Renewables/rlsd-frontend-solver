@@ -7,7 +7,10 @@ const client = postgres(process.env.POSTGRES_URL!);
 
 const getDB = () => {
   //Drizzle Verecl Only Works On Vercel Environment
-  if (process.env.NODE_ENV == "test") {
+  console.log(process.env.NODE_ENV);
+  if (process.env.DRIZZLE_STATE == "local") {
+    console.log("Using Drizzle PG");
+    //log the connection string
     return drizzlePG(client, { schema });
   } else {
     return drizzleVercel(sql, { schema });
