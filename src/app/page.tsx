@@ -13,6 +13,7 @@ export default async function Home({
   let zipCode: string | null = null;
   let electricityPrice: number | null = null;
   let systemOutput: number | null = null;
+  let isApproved: boolean = false;
   if (searchParams.groupId) {
     const groupId = parseInt(searchParams.groupId);
     const group = await getQuoteGroup(groupId);
@@ -25,10 +26,12 @@ export default async function Home({
     zipCode = group.zipCode;
     electricityPrice = parseFloat(group.electricityPrice);
     systemOutput = parseFloat(group.powerOutput);
+    isApproved = group.approved;
   }
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <View
+        isApproved={isApproved}
         zipCode={zipCode}
         electricityPrice={electricityPrice}
         systemOutput={systemOutput}

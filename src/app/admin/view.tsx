@@ -23,7 +23,12 @@ const View = () => {
 
   async function getQuoteGroupClientSide(id: number) {
     const get = await fetch(`/api/find-group-by-id?groupId=${id}`);
+    if (get.status >= 400) {
+      toast.error("Group not found");
+      throw new Error("Group not found");
+    }
     const data = await get.json();
+
     return data as ReturnTypeOfGetQuoteGroup;
   }
   const [findGroupQuery] = useQueries({
@@ -32,13 +37,16 @@ const View = () => {
         queryKey: ["findGroup", groupId],
         queryFn: () => getQuoteGroupClientSide(groupId as number),
         enabled: false,
+        retry: false,
       },
     ],
   });
 
   const approveQuoteGroupMutationFN = async () => {
-    if (!groupId) return;
+    if (!groupId) throw new Error("Group Id is required");
+    if (!findGroupQuery.data) throw new Error("Group not found");
     const get = await fetch(`/api/approve-quote-group?groupId=${groupId}`);
+    if (get.status >= 400) throw new Error("Group Id Already Approved");
     const data = await get.json();
     return data as ReturnTypeOfApproveQuoteGroup;
   };
@@ -49,7 +57,7 @@ const View = () => {
       toast.success("Successfully approved quote group");
     },
     onError: (error) => {
-      toast.error("Error approving quote group");
+      toast.error(error.message);
     },
   });
   return (
@@ -107,23 +115,27 @@ const View = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {findGroupQuery.data?.quotes.map((quote) => {
-            return (
-              <TableRow key={quote.id}>
-                <TableCell>
-                  {new Date(
-                    parseInt(quote.timestampToBenchmark) * 1000
-                  ).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  ${parseFloat(quote.quote!).toLocaleString()}
-                </TableCell>
-              </TableRow>
-            );
-          })}
+          {findGroupQuery.data?.quotes &&
+            findGroupQuery.data.quotes.map((quote) => {
+              return (
+                <TableRow key={quote.id}>
+                  <TableCell>
+                    {new Date(
+                      parseInt(quote.timestampToBenchmark) * 1000
+                    ).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    ${parseFloat(quote.quote!).toLocaleString()}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
         </TableBody>
       </Table>
       <Button
+        disabled={
+          approveQuoteGroupMutation.isPending || !findGroupQuery.isSuccess
+        }
         onClick={() => {
           //if success already don't call again
           if (approveQuoteGroupMutation.isPending) return;

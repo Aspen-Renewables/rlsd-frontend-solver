@@ -7,6 +7,7 @@ export async function GET(request: Request) {
   //Delete and return
   // await db.delete(QuoteGroup);
   // return Response.json({ message: "Deleted" });
+
   const { searchParams } = new URL(request.url);
 
   const electricityPrice = searchParams.get("electricityPrice");
@@ -152,6 +153,21 @@ async function getEstimateFarmValue(
     counter++;
   }
 
+  //lso add protocol fees
+  //TODO: Left off here
+  const protocolFees = await elysiaClient.protocolFees.estimateFees.get({
+    $query: {
+      electricityPricePerKWH: electricityPriceKWH.toFixed(4),
+      latitude: lat.toFixed(4),
+      longitude: long.toFixed(4),
+      powerOutputMWH: (powerOutputKWH / 1000).toFixed(4),
+    },
+  });
+  if (!protocolFees.data) throw new Error("Fetching Protocol fees Error");
+  //Lpog the protocol fees
+  console.log("protocol fees", protocolFees.data.protocolFees);
+
+  // console.log("protocol fees", protocolFees.data.protocolFees);
   const group: InsertQuoteGroup = {
     electricityPrice: electricityPriceKWH.toFixed(4),
     powerOutput: powerOutputKWH.toFixed(4),
@@ -168,6 +184,7 @@ async function getEstimateFarmValue(
     lat: lat.toFixed(4),
     lon: long.toFixed(4),
     carbonCreditEffectiveness: carbonCreditEffectiveness.toFixed(4),
+    protocolFees: protocolFees.data?.protocolFees.toFixed(4),
   };
   const quoteGroup: InsertQuoteSingle[] = otherEstimates.map((estimate) => ({
     quote: estimate.estimate.toFixed(4),
@@ -184,12 +201,15 @@ async function getEstimateFarmValue(
 
   //Filter other estimates to only include benchmarks >= current day
   const currentDay = Math.floor(new Date().getTime() / 1000 / 86400);
-  const filteredOtherEstimates = otherEstimates.filter(
-    (estimate) => estimate.timestamp / 86400 >= currentDay
-  );
+
+  //TODO: Estimate in the frontend
+  // const filteredOtherEstimates = otherEstimates.filter(
+  //   (estimate) => estimate.timestamp / 86400 >= currentDay
+  // );
 
   return {
-    estimates: filteredOtherEstimates,
+    estimates: otherEstimates,
     quoteGroupId,
+    protocolFees: protocolFees.data?.protocolFees,
   };
 }

@@ -41,7 +41,19 @@ export async function getQuoteGroup(id: number) {
     },
   });
 
-  return res;
+  //Find if it has an approved quote group
+  const approvedQuoteGroup = await db.query.ApprovedQuoteGroup.findFirst({
+    where: (approvedQuoteGroup, { eq }) =>
+      eq(approvedQuoteGroup.quoteGroupId, id),
+  });
+
+  if (!res) {
+    throw new Error("Quote group not found");
+  }
+  return {
+    ...res,
+    approved: approvedQuoteGroup ? true : false,
+  };
 }
 export type ReturnTypeOfGetQuoteGroup = Awaited<
   ReturnType<typeof getQuoteGroup>
@@ -56,6 +68,7 @@ export async function getApprovedQuoteGroups() {
       },
     },
   });
+
   return res;
 }
 
@@ -64,6 +77,7 @@ export type ReturnTypeOfGetApprovedQuoteGroups = Awaited<
 >;
 
 export async function approveQuoteGroup(id: number) {
+  const INSTALLER_FEE = 1200;
   await db.transaction(async (tx) => {
     const quoteGroupId = await tx.query.QuoteGroup.findFirst({
       where: (quoteGroup, { eq }) => eq(quoteGroup.id, id),
@@ -73,6 +87,7 @@ export async function approveQuoteGroup(id: number) {
     });
     if (!quoteGroupId) throw new Error("Quote group not found");
     const firstQuoteAmount = parseFloat(quoteGroupId.quotes[0].quote!);
+    const protocolFee = parseFloat(quoteGroupId.protocolFees);
 
     await tx.insert(ApprovedQuoteGroup).values({
       quoteGroupId: id,
@@ -80,13 +95,13 @@ export async function approveQuoteGroup(id: number) {
     await tx
       .insert(TotalBudgetGranted)
       .values({
-        amount: `${firstQuoteAmount}`,
+        amount: `${firstQuoteAmount + protocolFee + INSTALLER_FEE}`,
         id: 1,
       })
       .onConflictDoUpdate({
         target: TotalBudgetGranted.id,
         set: {
-          amount: sql`${TotalBudgetGranted.amount} + ${firstQuoteAmount}`,
+          amount: sql`${TotalBudgetGranted.amount} + ${firstQuoteAmount + protocolFee + INSTALLER_FEE}`,
         },
       });
   });

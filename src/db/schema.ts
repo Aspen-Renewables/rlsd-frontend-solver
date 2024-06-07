@@ -24,7 +24,9 @@ export const ApprovedQuoteGroup = pgTable(
     })
       .notNull()
       .$defaultFn(() => Math.floor(new Date().getTime() / 1000).toString()),
-    quoteGroupId: serial("quote_group_id").references(() => QuoteGroup.id),
+    quoteGroupId: serial("quote_group_id")
+      .references(() => QuoteGroup.id, { onDelete: "cascade" })
+      .notNull(),
   },
   (t) => {
     return {
@@ -85,6 +87,7 @@ export const QuoteGroup = pgTable("quote_group", {
     precision: 10,
     scale: 4,
   }).notNull(),
+  protocolFees: decimal("protocol_fees", { precision: 14, scale: 4 }).notNull(),
 });
 
 export const QuoteSingle = pgTable("quote", {

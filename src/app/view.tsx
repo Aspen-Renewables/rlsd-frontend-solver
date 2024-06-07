@@ -65,6 +65,7 @@ type Args = {
   zipCode: string | null;
   electricityPrice: number | null;
   systemOutput: number | null;
+  isApproved: boolean;
 };
 type State = Record<StateKey, SingleState>;
 const View = (args: Args) => {
@@ -312,6 +313,11 @@ const View = (args: Args) => {
               <div className={`pl-3 mt-6 mb-3`}>
                 {/* <div className={`${estimateMutation.isPending && "invisible"}`}> */}
                 {/**Italics */}
+                {args.isApproved && (
+                  <p className="  rounded-lg  text-center flex  text-green-600">
+                    This estimate is approved
+                  </p>
+                )}
                 <p className="italic text-xl">
                   Estimated <strong className=" not-italic">payments</strong>{" "}
                 </p>
