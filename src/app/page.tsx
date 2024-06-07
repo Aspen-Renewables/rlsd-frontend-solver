@@ -14,6 +14,7 @@ export default async function Home({
   let electricityPrice: number | null = null;
   let systemOutput: number | null = null;
   let isApproved: boolean = false;
+  let scoutFee: number = 0;
   if (searchParams.groupId) {
     const groupId = parseInt(searchParams.groupId);
     const group = await getQuoteGroup(groupId);
@@ -23,11 +24,16 @@ export default async function Home({
       estimate: parseFloat(quote.quote!),
     }));
     estimates = _estimates;
+    scoutFee = parseFloat(group.scoutingFee);
     zipCode = group.zipCode;
     electricityPrice = parseFloat(group.electricityPrice);
     systemOutput = parseFloat(group.powerOutput);
     isApproved = group.approved;
   }
+  const estimatesMinusFees = estimates?.map((estimate) => ({
+    timestamp: estimate.timestamp,
+    estimate: estimate.estimate * (1 - scoutFee),
+  })) as Estimate[];
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <View
@@ -35,7 +41,7 @@ export default async function Home({
         zipCode={zipCode}
         electricityPrice={electricityPrice}
         systemOutput={systemOutput}
-        estimates={estimates}
+        estimates={estimatesMinusFees}
       />
     </main>
   );
