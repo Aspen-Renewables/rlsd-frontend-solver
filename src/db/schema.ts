@@ -80,7 +80,7 @@ export const QuoteGroup = pgTable("quote_group", {
     scale: 0,
   }).notNull(),
   decayPerDay: decimal("decay_per_day", { precision: 10, scale: 5 }).notNull(),
-  installerFee: decimal("installer_fee", { precision: 10, scale: 4 }).notNull(),
+  scoutingFee: decimal("installer_fee", { precision: 10, scale: 4 }).notNull(),
   lat: decimal("lat", { precision: 10, scale: 4 }),
   lon: decimal("lon", { precision: 10, scale: 4 }).notNull(),
   carbonCreditEffectiveness: decimal("carbon_credit_effectiveness", {

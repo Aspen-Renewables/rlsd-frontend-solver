@@ -1,0 +1,1 @@
+export const DEFAULT_INSTALL_FEE = 1200;

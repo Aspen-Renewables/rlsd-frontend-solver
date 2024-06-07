@@ -3,49 +3,52 @@ import { getLatLongFromZip } from "@/api/extra/getLatLongFromZip";
 import { InsertQuoteGroup, InsertQuoteSingle, QuoteGroup } from "@/db/schema";
 import { createQuoteGroup } from "@/db/queries";
 import { db } from "@/db/db";
+import { DEFAULT_INSTALL_FEE } from "@/constants";
 export async function GET(request: Request) {
   //Delete and return
   // await db.delete(QuoteGroup);
   // return Response.json({ message: "Deleted" });
+  const simonEstimate = await getEstimateFarmValue(0.13, 20_000, 44.4, "10001");
+  return Response.json({ ...simonEstimate });
+  // const { searchParams } = new URL(request.url);
 
-  const { searchParams } = new URL(request.url);
+  // const electricityPrice = searchParams.get("electricityPrice");
+  // const powerOutput = searchParams.get("powerOutput");
+  // const systemSize = searchParams.get("systemSize");
+  // const zipCode = searchParams.get("zipCode");
 
-  const electricityPrice = searchParams.get("electricityPrice");
-  const powerOutput = searchParams.get("powerOutput");
-  const systemSize = searchParams.get("systemSize");
-  const zipCode = searchParams.get("zipCode");
+  // if (!electricityPrice) throw new Error("electricityPrice is required");
+  // if (!powerOutput) throw new Error("powerOutput is required");
+  // if (!systemSize) throw new Error("systemSize is required");
+  // if (!zipCode) throw new Error("zipCode is required");
 
-  if (!electricityPrice) throw new Error("electricityPrice is required");
-  if (!powerOutput) throw new Error("powerOutput is required");
-  if (!systemSize) throw new Error("systemSize is required");
-  if (!zipCode) throw new Error("zipCode is required");
+  // const data = await getEstimateFarmValue(
+  //   parseFloat(electricityPrice),
+  //   parseFloat(powerOutput),
+  //   parseFloat(systemSize),
+  //   zipCode
+  // );
 
-  const data = await getEstimateFarmValue(
-    parseFloat(electricityPrice),
-    parseFloat(powerOutput),
-    parseFloat(systemSize),
-    zipCode
-  );
-
-  return Response.json({ ...data });
+  // return Response.json({ ...data });
 }
 
-const DEFAULT_INSTALLER_FEES = 0.2;
-const getInstallerFee = (): number => {
-  const installerFee = process.env.INSTALLER_FEE;
-  if (!installerFee) return DEFAULT_INSTALLER_FEES;
-  const float = parseFloat(installerFee);
-  if (isNaN(float)) return DEFAULT_INSTALLER_FEES;
+const DEFAULT_SCOUTING_FEE = 0.2;
+const getscoutingFee = (): number => {
+  const scoutingFee = process.env.SCOUTING_FEE;
+  if (!scoutingFee) return DEFAULT_SCOUTING_FEE;
+  const float = parseFloat(scoutingFee);
+  if (isNaN(float)) return DEFAULT_SCOUTING_FEE;
   return float;
 };
-const targetTimestamp = 1718028000;
+const targetTimestamp = 1718028000 - 86400 * 3;
 const formulaConstants = {
-  maximumElectricityPrice: 0.35,
-  protocolFeeValueMultiplier: 1.5,
+  maximumElectricityPrice: 0.32,
+  protocolFeeValueMultiplier: 3,
   startingDateTimestamp: targetTimestamp,
   targetTimestamp: targetTimestamp + 86400 * 7 * 4, //it's starting date + 4 weeks
   decayPerDay: 0.0055, //.55%,
-  installerFee: getInstallerFee(),
+  scoutingFee: getscoutingFee(),
+  protocolFeeInterestRate: 0.11,
 };
 
 type EstimateCalculationArgs = {
@@ -56,10 +59,10 @@ type EstimateCalculationArgs = {
   effectiveSunHoursPerDay: number;
   systemSizeKW: number;
   timestampToBenchmark: number;
-  installerFee: number;
+  scoutingFee: number;
 };
 function runEstimateCalculation(args: EstimateCalculationArgs) {
-  console.log(`installer fee is ${args.installerFee}`);
+  console.log(`installer fee is ${args.scoutingFee}`);
   const c3 = args.maximumElectricityPrice;
   const c10 = args.carbonCreditEffectiveness;
   const c9 = args.electricityPrice;
@@ -85,7 +88,7 @@ function runEstimateCalculation(args: EstimateCalculationArgs) {
   const c11 = args.effectiveSunHoursPerDay;
   const c12 = args.systemSizeKW;
   const answer = (a1 / c4) * c11 * 1000 * c12 * 2.44;
-  return answer * (1 - args.installerFee);
+  return answer * (1 - args.scoutingFee);
 }
 
 async function getEstimateFarmValue(
@@ -113,7 +116,8 @@ async function getEstimateFarmValue(
   if (!res.data) throw new Error("No data found");
   const sunlightHours = powerOutputKWH / 365.25 / systemSizeKW;
 
-  const carbonCreditEffectiveness = res.data?.average_carbon_certificates;
+  // const carbonCreditEffectiveness = res.data?.average_carbon_certificates;
+  const carbonCreditEffectiveness = 0.6379;
   const firstTimestamp = new Date().getTime() / 1000;
   const estimateCurrentWeek = {
     timestamp: formulaConstants.startingDateTimestamp,
@@ -125,7 +129,7 @@ async function getEstimateFarmValue(
       effectiveSunHoursPerDay: sunlightHours,
       systemSizeKW,
       timestampToBenchmark: firstTimestamp,
-      installerFee: formulaConstants.installerFee,
+      scoutingFee: formulaConstants.scoutingFee,
     }),
   };
 
@@ -142,7 +146,7 @@ async function getEstimateFarmValue(
       effectiveSunHoursPerDay: sunlightHours,
       systemSizeKW,
       timestampToBenchmark: firstTimestamp + 86400 * 7 * 2 * counter,
-      installerFee: formulaConstants.installerFee,
+      scoutingFee: formulaConstants.scoutingFee,
     });
 
     otherEstimates.push({
@@ -153,19 +157,18 @@ async function getEstimateFarmValue(
     counter++;
   }
 
-  //lso add protocol fees
-  //TODO: Left off here
-  const protocolFees = await elysiaClient.protocolFees.estimateFees.get({
-    $query: {
-      electricityPricePerKWH: electricityPriceKWH.toFixed(4),
-      latitude: lat.toFixed(4),
-      longitude: long.toFixed(4),
-      powerOutputMWH: (powerOutputKWH / 1000).toFixed(4),
-    },
-  });
-  if (!protocolFees.data) throw new Error("Fetching Protocol fees Error");
-  //Lpog the protocol fees
-  console.log("protocol fees", protocolFees.data.protocolFees);
+  const pricePerKWH = 1 / formulaConstants.protocolFeeInterestRate;
+  const protocolFee = electricityPriceKWH * powerOutputKWH * pricePerKWH;
+  const maxProtocolFees =
+    formulaConstants.maximumElectricityPrice * pricePerKWH * powerOutputKWH;
+
+  console.log({ maxProtocolFees });
+
+  const savingsVsMax = maxProtocolFees - protocolFee;
+  const appraisedCarbonCreditValue =
+    savingsVsMax / formulaConstants.protocolFeeValueMultiplier;
+  const totalCost =
+    protocolFee + DEFAULT_INSTALL_FEE + appraisedCarbonCreditValue;
 
   // console.log("protocol fees", protocolFees.data.protocolFees);
   const group: InsertQuoteGroup = {
@@ -180,11 +183,11 @@ async function getEstimateFarmValue(
     startingDateTimestamp: formulaConstants.startingDateTimestamp.toFixed(4),
     targetTimestamp: formulaConstants.targetTimestamp.toFixed(4),
     decayPerDay: formulaConstants.decayPerDay.toFixed(4),
-    installerFee: formulaConstants.installerFee.toFixed(4),
+    scoutingFee: formulaConstants.scoutingFee.toFixed(4),
     lat: lat.toFixed(4),
     lon: long.toFixed(4),
     carbonCreditEffectiveness: carbonCreditEffectiveness.toFixed(4),
-    protocolFees: protocolFees.data?.protocolFees.toFixed(4),
+    protocolFees: protocolFee.toFixed(4),
   };
   const quoteGroup: InsertQuoteSingle[] = otherEstimates.map((estimate) => ({
     quote: estimate.estimate.toFixed(4),
@@ -210,6 +213,8 @@ async function getEstimateFarmValue(
   return {
     estimates: otherEstimates,
     quoteGroupId,
-    protocolFees: protocolFees.data?.protocolFees,
+    protocolFees: protocolFee,
+    totalCost,
+    appraisedCarbonCreditValue,
   };
 }
