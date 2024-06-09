@@ -9,9 +9,16 @@ export const dynamic = "force-dynamic";
 export const revalidate = 1;
 
 const Page = async () => {
-  // const { signal } = new AbortController();
+  const approvedQuoteGroups: ReturnTypeOfGetApprovedQuoteGroups =
+    await getApprovedQuoteGroups();
 
-  return <View />;
+  const totalApproved = await db.query.TotalBudgetGranted.findFirst({});
+  return (
+    <View
+      totalApproved={parseFloat(totalApproved?.amount!) || 0}
+      data={approvedQuoteGroups}
+    />
+  );
 };
 
 export default Page;

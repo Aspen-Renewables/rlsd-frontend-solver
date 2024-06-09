@@ -4,7 +4,6 @@ import {
   ReturnTypeOfGetApprovedQuoteGroups,
 } from "@/db/queries";
 export async function GET(request: Request) {
-  console.log("herE!");
   const approvedQuoteGroups: ReturnTypeOfGetApprovedQuoteGroups =
     await getApprovedQuoteGroups();
 
