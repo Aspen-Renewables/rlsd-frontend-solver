@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { ReturnTypeOfGetApprovedQuoteGroups } from "@/db/queries";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const View = ({
   data,
@@ -82,9 +83,9 @@ const View = ({
                   </TableCell>
 
                   <TableCell>
-                    <a href={`/?groupId=${quoteGroup.quoteGroupId}`}>
+                    <Link href={`/?groupId=${quoteGroup.quoteGroupId}`}>
                       <Button>View</Button>
-                    </a>
+                    </Link>
                   </TableCell>
                 </TableRow>
               );
