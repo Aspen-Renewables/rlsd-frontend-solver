@@ -19,10 +19,10 @@ export const Sidebar = ({ sections }: { sections: DashboardItem[] }) => {
               pathname === item.href && "bg-gray-300"
             )}
           >
-            <Link href={item.href} className="flex items-center space-x-2">
+            <a href={item.href} className="flex items-center space-x-2">
               {item.icon}
               <span className="text-xs uppercase font-bold">{item.title}</span>
-            </Link>
+            </a>
           </div>
         );
       })}
