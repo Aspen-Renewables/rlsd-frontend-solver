@@ -6,7 +6,7 @@ import { InsertQuoteGroup, InsertQuoteSingle } from "@/db/schema";
 const DEFAULT_SCOUTING_FEE = 0.2;
 
 const startingDateTimestamp = 1718028000 - 86400 * 3;
-const getscoutingFee = (): number => {
+export const getScoutingFee = (): number => {
   const scoutingFee = process.env.SCOUTING_FEE;
   if (!scoutingFee) return DEFAULT_SCOUTING_FEE;
   const float = parseFloat(scoutingFee);
@@ -19,7 +19,7 @@ const formulaConstants = {
   startingDateTimestamp: startingDateTimestamp,
   //   targetTimestamp: startingDateTimestamp + 86400 * 7 * 4, //it's starting date + 4 weeks
   decayPerDay: 0.0055, //.55%,
-  scoutingFee: getscoutingFee(),
+  scoutingFee: getScoutingFee(),
   protocolFeeInterestRate: 0.11,
 };
 

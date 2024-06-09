@@ -14,14 +14,17 @@ import { Button } from "@/components/ui/button";
 const View = ({
   data,
   totalApproved,
+  totalScoutFee,
 }: {
   data: ReturnTypeOfGetApprovedQuoteGroups;
   totalApproved: number;
+  totalScoutFee: number;
 }) => {
   return (
     <div className="p-4">
       <div className="font-bold text-lg mt-12">
         <h1>Total Approved Budget: ${totalApproved.toLocaleString()}</h1>
+        <h2>Total Scout Fees: ${totalScoutFee.toLocaleString()}</h2>
       </div>
       <div className="flex">
         <Table>

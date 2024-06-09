@@ -242,8 +242,7 @@ const View = (args: Args) => {
                 {/* <div className={`${estimateMutation.isPending && "invisible"}`}> */}
                 {/**Italics */}
                 <p className="italic text-xl">
-                  Your <strong className=" not-italic">Solar System</strong>{" "}
-                  alternative
+                  <strong>Carbon Credit Rewards Calculator</strong>
                 </p>
               </div>
               <div className="border-b h-[1px] border-black w-full" />
@@ -321,7 +320,7 @@ const View = (args: Args) => {
                   </p>
                 )}
                 <p className="italic text-xl">
-                  Estimated <strong className=" not-italic">payments</strong>{" "}
+                  <strong>Payout based on PTO date</strong>
                 </p>
               </div>
               <div className="border-b h-[1px] border-black w-full" />
