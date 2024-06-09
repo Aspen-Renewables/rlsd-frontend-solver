@@ -5,6 +5,7 @@ import { useCookie } from "react-use";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ADMIN_PASSWORD_HEADER_KEY } from "@/constants";
+import { toast } from "sonner";
 const View = () => {
   const router = useRouter();
   const [passwordCookie, setPasswordCookie] = useCookie(
@@ -23,6 +24,7 @@ const View = () => {
       headers: requestHeaders,
     });
     if (res.status !== 200) {
+      toast.error("Incorrect password");
       alert("Incorrect password");
       return;
     }
@@ -33,7 +35,7 @@ const View = () => {
     <main className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-md shadow-md">
         <h1 className="text-2xl font-semibold text-center">Login</h1>
-        <form className="mt-4">
+        <div className="mt-4">
           <Input
             onChange={(e) =>
               setPasswordCookie(e.target.value, { sameSite: "strict" })
@@ -48,7 +50,7 @@ const View = () => {
           >
             Login
           </Button>
-        </form>
+        </div>
       </div>
     </main>
   );
