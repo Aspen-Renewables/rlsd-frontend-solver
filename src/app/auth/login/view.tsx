@@ -4,11 +4,28 @@ import { Input } from "@/components/ui/input";
 import { useCookie } from "react-use";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { ADMIN_PASSWORD_HEADER_KEY } from "@/constants";
 const View = () => {
   const router = useRouter();
-  const [passwordCookie, setPasswordCookie] = useCookie("x-password");
+  const [passwordCookie, setPasswordCookie] = useCookie(
+    ADMIN_PASSWORD_HEADER_KEY
+  );
 
-  const submit = () => {
+  const submit = async () => {
+    //fetch /api/check-password
+    const requestHeaders: HeadersInit = new Headers();
+    if (!passwordCookie) {
+      alert("Password is required");
+      return;
+    }
+    requestHeaders.set(ADMIN_PASSWORD_HEADER_KEY, passwordCookie);
+    const res = await fetch("/api/check-password", {
+      headers: requestHeaders,
+    });
+    if (res.status !== 200) {
+      alert("Incorrect password");
+      return;
+    }
     //Redirect to /admin
     router.push("/admin");
   };

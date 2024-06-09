@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { ADMIN_PASSWORD_HEADER_KEY } from "./constants";
 
 const loginRoute = "/auth/login";
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
-  const password = request.cookies.get("x-password")?.value;
+  const password = request.cookies.get(ADMIN_PASSWORD_HEADER_KEY)?.value;
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) {
     // redirect to /warning
