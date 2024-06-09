@@ -18,9 +18,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
-import { DEFAULT_INSTALL_FEE } from "@/constants";
+import { ADMIN_PASSWORD_HEADER_KEY } from "@/constants";
+import { useCookie } from "react-use";
+import { useRouter } from "next/navigation";
 const View = () => {
   const [groupId, setGroupId] = React.useState<number | null>(null);
+  const [passwordCookie] = useCookie(ADMIN_PASSWORD_HEADER_KEY);
+  const router = useRouter();
 
   async function getQuoteGroupClientSide(id: number) {
     const get = await fetch(`/api/find-group-by-id?groupId=${id}`);
@@ -46,7 +50,17 @@ const View = () => {
   const approveQuoteGroupMutationFN = async () => {
     if (!groupId) throw new Error("Group Id is required");
     if (!findGroupQuery.data) throw new Error("Group not found");
-    const get = await fetch(`/api/approve-quote-group?groupId=${groupId}`);
+    const headers: HeadersInit = new Headers();
+
+    if (!passwordCookie) {
+      router.push("/auth/login");
+      throw new Error("Password is required");
+    }
+    headers.set(ADMIN_PASSWORD_HEADER_KEY, passwordCookie);
+    const get = await fetch(`/api/approve-quote-group?groupId=${groupId}`, {
+      headers,
+    });
+    if (get.status === 401) throw new Error("Unauthorized");
     if (get.status >= 400) throw new Error("Group Id Already Approved");
     const data = await get.json();
     return data as ReturnTypeOfApproveQuoteGroup;

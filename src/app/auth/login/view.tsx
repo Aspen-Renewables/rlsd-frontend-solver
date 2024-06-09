@@ -35,7 +35,9 @@ const View = () => {
         <h1 className="text-2xl font-semibold text-center">Login</h1>
         <form className="mt-4">
           <Input
-            onChange={(e) => setPasswordCookie(e.target.value)}
+            onChange={(e) =>
+              setPasswordCookie(e.target.value, { sameSite: "strict" })
+            }
             type="password"
             placeholder="password"
             className="mb-4"
