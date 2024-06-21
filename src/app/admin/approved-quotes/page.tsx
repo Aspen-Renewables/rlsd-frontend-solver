@@ -6,6 +6,7 @@ import {
 import View from "./view";
 import { db } from "@/db/db";
 import { getScoutingFee } from "@/app/api/compute/route";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 1;
 
