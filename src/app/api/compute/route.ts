@@ -3,15 +3,15 @@ import { getLatLongFromZip } from "@/api/extra/getLatLongFromZip";
 import { DEFAULT_INSTALL_FEE } from "@/constants";
 import { createQuoteGroup } from "@/db/queries";
 import { InsertQuoteGroup, InsertQuoteSingle } from "@/db/schema";
-const DEFAULT_SCOUTING_FEE = 0.2;
+// const DEFAULT_SCOUTING_FEE = 0.2;
 
 const startingDateTimestamp = 1718028000 - 86400 * 3;
 export const getScoutingFee = (): number => {
   const scoutingFee = process.env.SCOUTING_FEE;
+  if (!scoutingFee) throw new Error("process.env.SCOUTING_FEE is not defined");
   console.log(`env scouting fee = ${scoutingFee}`);
-  if (!scoutingFee) return DEFAULT_SCOUTING_FEE;
   const float = parseFloat(scoutingFee);
-  if (isNaN(float)) return DEFAULT_SCOUTING_FEE;
+  if (isNaN(float)) throw new Error("SCOUTING_FEE is not a number");
   return float;
 };
 const formulaConstants = {
