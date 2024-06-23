@@ -7,9 +7,14 @@
 4. Connect your GitHub account to Vercel
 5. Create a new project on the vercel dashboard
    <img src="assets/add-new-project.png"/>
-6. Import Repository and Launch Project
+6. Import Repository, Set Environment Variables, and Launch Project
    <img src="assets/import-repo.png"/>
    <img src="assets/deploy.png"/>
+   - Make sure to Hit `Add Environment Variables`
+   - You must fill in the following
+     - ADMIN_PASSWORD (this is the password to access the admin panel)
+     - NEXT_PUBLIC_LOGO_URL (this is the URL to the logo image the site will use)
+     - SCOUTING_FEE ( 0.2 = 20%)
 7. Go back to your dashboard and click on the project you just created
 8. Go to the `storage` tab
    - Note: The first deploy should have failed because we haven't setup storage yet

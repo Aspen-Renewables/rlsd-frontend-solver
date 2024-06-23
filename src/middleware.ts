@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
     }
   }
   const authenticated = password === adminPassword;
-  if (isAdminPath(request.nextUrl.pathname)) {
+  if (isAdminPath(request.nextUrl.pathname)) {  
     if (!authenticated) {
       return NextResponse.redirect(new URL(loginRoute, request.url));
     }
